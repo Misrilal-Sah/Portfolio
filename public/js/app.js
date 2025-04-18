@@ -1911,59 +1911,60 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _NetflixTitle_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NetflixTitle.vue */ "./resources/js/components/NetflixTitle.vue");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'App',
   components: {
     NetflixTitle: _NetflixTitle_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
     return {
-      storedProfileType: null
+      isMobileMenuHidden: true,
+      currentProfileType: localStorage.getItem('profileType') || 'grey'
     };
   },
-  created: function created() {
-    var _this = this;
-    // Initialize the stored profile type when the app is created
-    this.initializeProfileType();
-
-    // Watch for route changes to update the stored profile type
-    this.$watch('$route', function (to, from) {
-      if (to.params.type && to.name === 'profile-home') {
-        // Update stored profile type when navigating to a profile page
-        _this.updateStoredProfileType(to.params.type);
-      }
-    });
+  mounted: function mounted() {
+    // Listen for changes to localStorage
+    window.addEventListener('storage', this.handleStorageChange);
   },
-  methods: {
-    initializeProfileType: function initializeProfileType() {
-      // Get profile type from localStorage or default to 'blue'
-      var storedType = localStorage.getItem('profileType');
+  beforeDestroy: function beforeDestroy() {
+    // Remove the listener when component is destroyed
+    window.removeEventListener('storage', this.handleStorageChange);
+  },
+  watch: {
+    '$route': function $route() {
+      // Close mobile menu on route change
+      this.closeMobileMenu();
 
-      // If we're on a profile route, use that type and store it
-      if (this.$route.params.type && this.$route.name === 'profile-home') {
-        this.updateStoredProfileType(this.$route.params.type);
+      // Update profile type if navigating to a profile page
+      if (this.$route.name === 'profile-home' && this.$route.params.type) {
+        this.currentProfileType = this.$route.params.type;
+        localStorage.setItem('profileType', this.$route.params.type);
       }
-      // Otherwise use the stored type or default
-      else if (storedType) {
-        this.storedProfileType = storedType;
-      } else {
-        this.updateStoredProfileType('blue');
-      }
-    },
-    updateStoredProfileType: function updateStoredProfileType(type) {
-      this.storedProfileType = type;
-      localStorage.setItem('profileType', type);
     }
   },
   computed: {
     isHiddenHeaderPage: function isHiddenHeaderPage() {
-      return this.$route.name === 'browse' || this.$route.name === 'home';
+      return this.$route.name === 'home' || this.$route.name === 'browse';
     },
     profileImageSrc: function profileImageSrc() {
-      // Use the stored profile type for the image
-      return "/images/".concat(this.storedProfileType || 'blue', ".png");
+      return "/images/".concat(this.currentProfileType || 'grey', ".png");
+    }
+  },
+  methods: {
+    toggleMobileMenu: function toggleMobileMenu() {
+      this.isMobileMenuHidden = !this.isMobileMenuHidden;
     },
-    currentProfileType: function currentProfileType() {
-      return this.storedProfileType || 'blue';
+    closeMobileMenu: function closeMobileMenu() {
+      this.isMobileMenuHidden = true;
+    },
+    navigateToProfiles: function navigateToProfiles() {
+      this.closeMobileMenu();
+      this.$router.push({
+        name: 'browse'
+      });
+    },
+    handleStorageChange: function handleStorageChange(event) {
+      if (event.key === 'profileType') {
+        this.currentProfileType = event.newValue;
+      }
     }
   }
 });
@@ -2036,6 +2037,8 @@ __webpack_require__.r(__webpack_exports__);
   name: 'Browse',
   methods: {
     navigateToProfile: function navigateToProfile(profileType) {
+      // Store the selected profile type in localStorage
+      localStorage.setItem('profileType', profileType);
       this.$router.push({
         name: 'profile-home',
         params: {
@@ -2519,15 +2522,15 @@ __webpack_require__.r(__webpack_exports__);
             section: 'skills',
             image: '/images/cards/skills.jpg'
           }, {
+            title: 'Certifications',
+            type: 'Professional Development',
+            section: 'certifications',
+            image: '/images/cards/certification.jpg'
+          }, {
             title: 'Hire Me',
             type: 'Get in Touch',
             section: 'contact',
             image: '/images/cards/contact_me.jpg'
-          }, {
-            title: 'Certifications',
-            type: 'Professional Development',
-            section: 'about',
-            image: '/images/cards/certification.jpg'
           }],
           continueWatching: [{
             title: 'About Me',
@@ -2575,6 +2578,11 @@ __webpack_require__.r(__webpack_exports__);
             section: 'projects',
             progress: 80,
             image: '/images/cards/projects.jpg'
+          }, {
+            title: 'Certifications',
+            type: 'Professional Development',
+            section: 'certifications',
+            image: '/images/cards/certification.jpg'
           }]
         },
         red: {
@@ -2602,6 +2610,11 @@ __webpack_require__.r(__webpack_exports__);
             image: '/images/cards/projects.jpg'
           }],
           continueWatching: [{
+            title: 'Certifications',
+            type: 'Professional Development',
+            section: 'certifications',
+            image: '/images/cards/certification.jpg'
+          }, {
             title: 'Tech Stack',
             section: 'skills',
             progress: 60,
@@ -2622,10 +2635,10 @@ __webpack_require__.r(__webpack_exports__);
             section: 'projects',
             image: '/images/cards/projects.jpg'
           }, {
-            title: 'Journey',
-            type: 'Career Adventure',
-            section: 'experience',
-            image: '/images/cards/work-experience.jpg'
+            title: 'Certifications',
+            type: 'Professional Development',
+            section: 'certifications',
+            image: '/images/cards/certification.jpg'
           }, {
             title: 'Tech Explorer',
             type: 'Skills',
@@ -2659,7 +2672,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     profileType: function profileType() {
-      return this.$route.params.type || 'blue';
+      var type = this.$route.params.type || 'blue';
+      localStorage.setItem('profileType', type);
+      return type;
     },
     profileName: function profileName() {
       var _this$profileData$thi;
@@ -3079,10 +3094,34 @@ var render = function render() {
     }
   })], 1)], 1), _vm._v(" "), _c("nav", {
     staticClass: "main-nav",
-    staticStyle: {
-      "margin-left": "30px"
+    "class": {
+      "mobile-hidden": _vm.isMobileMenuHidden
     }
-  }, [_c("router-link", {
+  }, [_c("div", {
+    staticClass: "menu-close-button",
+    on: {
+      click: _vm.closeMobileMenu
+    }
+  }, [_c("img", {
+    staticClass: "close-icon",
+    attrs: {
+      src: "/images/cross-svgrepo-com.svg",
+      alt: "Close"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "profile-item"
+  }, [_c("div", {
+    staticClass: "profile-menu-item",
+    on: {
+      click: _vm.navigateToProfiles
+    }
+  }, [_c("img", {
+    staticClass: "profile-menu-image",
+    attrs: {
+      src: _vm.profileImageSrc,
+      alt: "Profile"
+    }
+  }), _vm._v(" "), _c("span", [_vm._v("Profile")])])]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "profile-home",
@@ -3090,44 +3129,76 @@ var render = function render() {
           type: _vm.currentProfileType
         }
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Home")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "about"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("About")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "projects"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Projects")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "experience"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Experience")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "skills"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Skills")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "certifications"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Certifications")]), _vm._v(" "), _c("router-link", {
     attrs: {
       to: {
         name: "contact"
       }
+    },
+    on: {
+      click: _vm.closeMobileMenu
     }
   }, [_vm._v("Contact")])], 1), _vm._v(" "), _c("div", {
+    staticClass: "mobile-menu-button",
+    on: {
+      click: _vm.toggleMobileMenu
+    }
+  }, [_c("img", {
+    staticClass: "menu-icon",
+    attrs: {
+      src: "/images/menu-svgrepo-com.svg",
+      alt: "Menu"
+    }
+  })]), _vm._v(" "), _c("div", {
     staticClass: "profile-container"
   }, [_c("router-link", {
     staticClass: "profile-icon",
@@ -4020,11 +4091,11 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "timeline-end"
+    staticClass: "timeline-item right"
   }, [_c("div", {
-    staticClass: "timeline-marker star-marker",
+    staticClass: "timeline-marker education-marker over-marker",
     attrs: {
-      "data-tooltip": "Career Start"
+      "data-tooltip": "Education"
     }
   }, [_c("img", {
     staticClass: "timeline-icon",
@@ -8827,7 +8898,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: 'Helvetica Neue', Arial, sans-serif;\n  background-color: #141414;\n  color: #ffffff;\n}\n.netflix-app {\n  display: flex;\n  flex-direction: column;\n  min-height: 100vh;\n}\n.app-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 20px 50px;\n  background-color: rgba(0, 0, 0, 0.8);\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  z-index: 100;\n}\n.logo {\n  font-size: 1.5rem;\n  font-weight: bold;\n}\n.logo a {\n  text-decoration: none;\n  display: block;\n}\n.main-nav {\n  display: flex;\n  gap: 20px;\n  margin-right: auto;\n}\n.main-nav a {\n  color: #e5e5e5;\n  text-decoration: none;\n  font-size: 16px;\n  transition: color 0.3s;\n  position: relative;\n  padding-bottom: 5px;\n}\n.main-nav a::after {\n  content: '';\n  position: absolute;\n  bottom: -2px;\n  left: 0;\n  width: 100%;\n  height: 3px;\n  background-color: #E50914;\n  transform: scaleX(0);\n  transition: transform 0.3s ease;\n}\n.main-nav a:hover {\n  color: #ffffff;\n}\n.main-nav a:hover::after {\n  transform: scaleX(0.5);\n}\n.main-nav a.router-link-active {\n  color: #ffffff;\n  font-weight: 500;\n}\n.main-nav a.router-link-active::after {\n  transform: scaleX(1);\n}\n.profile-container {\n  margin-left: 20px;\n}\n.profile-icon {\n  display: block;\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  overflow: hidden;\n  border: 2px solid transparent;\n  transition: border-color 0.3s;\n}\n.profile-icon:hover {\n  border-color: #E50914;\n}\n.profile-image {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n}\n.main-content {\n  flex: 1;\n  padding-top: 80px;\n}\n.main-content.no-padding {\n  padding-top: 0;\n}\n.app-footer {\n  text-align: center;\n  /* padding: 20px; */\n  background-color: rgba(0, 0, 0, 0.8);\n  font-size: 14px;\n  color: #999;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 0.3s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n", ""]);
+exports.push([module.i, "\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: 'Helvetica Neue', Arial, sans-serif;\n  background-color: #141414;\n  color: #ffffff;\n}\n.netflix-app {\n  display: flex;\n  flex-direction: column;\n  min-height: 100vh;\n}\n.app-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 20px 50px;\n  background-color: rgba(0, 0, 0, 0.8);\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  z-index: 100;\n}\n.logo {\n  font-size: 1.5rem;\n  font-weight: bold;\n}\n.logo a {\n  text-decoration: none;\n  display: block;\n}\n.main-nav {\n  display: flex;\n  gap: 20px;\n  margin-right: auto;\n  margin-left: 30px;\n}\n.main-nav a {\n  color: #e5e5e5;\n  text-decoration: none;\n  font-size: 16px;\n  transition: color 0.3s;\n  position: relative;\n  padding-bottom: 5px;\n}\n.main-nav a::after {\n  content: '';\n  position: absolute;\n  bottom: -2px;\n  left: 0;\n  width: 100%;\n  height: 3px;\n  background-color: #E50914;\n  transform: scaleX(0);\n  transition: transform 0.3s ease;\n}\n.main-nav a:hover {\n  color: #ffffff;\n}\n.main-nav a:hover::after {\n  transform: scaleX(0.5);\n}\n.main-nav a.router-link-active {\n  color: #ffffff;\n  font-weight: 500;\n}\n.main-nav a.router-link-active::after {\n  transform: scaleX(1);\n}\n.profile-container {\n  margin-left: 20px;\n}\n.profile-icon {\n  display: block;\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  overflow: hidden;\n  border: 2px solid transparent;\n  transition: border-color 0.3s;\n}\n.profile-icon:hover {\n  border-color: #E50914;\n}\n.profile-image {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n}\n.main-content {\n  flex: 1;\n  padding-top: 80px;\n}\n.main-content.no-padding {\n  padding-top: 0;\n}\n.app-footer {\n  text-align: center;\n  /* padding: 20px; */\n  background-color: rgba(0, 0, 0, 0.8);\n  font-size: 14px;\n  color: #999;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 0.3s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n\n/* Mobile Menu Styles */\n.mobile-menu-button {\n  display: none;\n  cursor: pointer;\n}\n.menu-icon {\n  width: 30px;\n  height: 30px;\n  filter: invert(100%);\n}\n.menu-close-button {\n  display: none;\n  position: absolute;\n  /* top: 20px;\n  right: 20px; */\n  margin-left: 25px;\n  cursor: pointer;\n  z-index: 100;\n}\n.close-icon {\n  width: 35px;\n  height: 35px;\n  filter: invert(100%);\n}\n.profile-item {\n  display: none;\n}\n.profile-menu-item {\n  display: flex;\n  align-items: center;\n  padding: 15px 25px;\n  border-bottom: 1px solid rgba(255, 255, 255, 0.1);\n  margin-top: 40px;\n  cursor: pointer;\n}\n.profile-menu-item:hover {\n  background-color: rgba(229, 9, 20, 0.2);\n}\n.profile-menu-image {\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  margin-right: 15px;\n}\n@media (max-width: 1024px) {\n.app-header {\n    padding: 15px 20px;\n}\n.mobile-menu-button {\n    display: block;\n    order: 3;\n    margin-left: 20px;\n}\n.main-nav {\n    position: fixed;\n    top: 0;\n    right: 0;\n    width: 0;\n    flex-direction: column;\n    background-color: rgba(0, 0, 0, 0.95);\n    margin: 0;\n    padding: 20px 0 0 0;\n    overflow-y: auto;\n    transition: width 0.3s ease;\n    z-index: 90;\n    gap: 0;\n    height: 100vh;\n}\n.main-nav.mobile-hidden {\n    width: 0;\n}\n.main-nav:not(.mobile-hidden) {\n    width: 250px;\n    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);\n}\n.main-nav:not(.mobile-hidden) .menu-close-button {\n    display: block;\n}\n.main-nav a {\n    padding: 15px 25px;\n    font-size: 18px;\n    width: 100%;\n    box-sizing: border-box;\n}\n.main-nav a::after {\n    display: none;\n}\n.main-nav a:hover,\n  .main-nav a.router-link-active {\n    background-color: rgba(229, 9, 20, 0.2);\n}\n.profile-container {\n    display: none;\n}\n.profile-item {\n    display: block;\n}\n}\n@media (max-width: 767px) {\n.app-header {\n    padding: 10px 15px;\n}\n.logo {\n    font-size: 1.2rem;\n}\n}\n\n/* Custom Scrollbar Styling */\n::-webkit-scrollbar {\n  width: 8px;\n  height: 8px;\n}\n::-webkit-scrollbar-track {\n  background: #141414;\n}\n::-webkit-scrollbar-thumb {\n  background: #E50914;\n  border-radius: 4px;\n}\n::-webkit-scrollbar-thumb:hover {\n  background: #FF0F1F;\n}\n\n/* Firefox scrollbar */\n* {\n  scrollbar-width: thin;\n  scrollbar-color: #E50914 #141414;\n}\n\n/* For Edge */\n::-webkit-scrollbar-button {\n  display: none;\n}\n", ""]);
 
 // exports
 
@@ -8865,7 +8936,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.about-page[data-v-520b5d54] {\r\n  max-width: 1200px;\r\n  margin: 0 auto;\r\n  padding: 20px;\n}\n.page-title[data-v-520b5d54] {\r\n  font-size: 2.5rem;\r\n  margin-bottom: 40px;\r\n  position: relative;\r\n  display: block;\r\n  text-align: center;\r\n  width: 100%;\n}\n.page-title[data-v-520b5d54]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  bottom: -10px;\r\n  width: 60px;\r\n  height: 4px;\r\n  background-color: #E50914;\n}\n.about-content[data-v-520b5d54] {\r\n  display: flex;\r\n  gap: 40px;\n}\n.about-image[data-v-520b5d54] {\r\n  flex: 0 0 300px;\n}\n.profile-image[data-v-520b5d54] {\r\n  width: 100%;\r\n  height: 400px;\r\n  background-color: #333;\r\n  background-image: url('/images/about/Misril-about.jpg');\r\n  background-size: cover;\r\n  background-position: center;\r\n  border-radius: 5px;\r\n  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);\n}\n.about-text[data-v-520b5d54] {\r\n  flex: 1;\n}\n.intro[data-v-520b5d54] {\r\n  font-size: 1.3rem;\r\n  line-height: 1.6;\r\n  margin-bottom: 30px;\r\n  color: #e5e5e5;\n}\n.section-title[data-v-520b5d54] {\r\n  font-size: 1.8rem;\r\n  margin: 30px 0 15px;\r\n  color: #e5e5e5;\n}\np[data-v-520b5d54] {\r\n  line-height: 1.6;\r\n  margin-bottom: 20px;\r\n  color: #b3b3b3;\n}\n.skills-container[data-v-520b5d54] {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  gap: 30px;\r\n  margin-top: 20px;\n}\n.skill-category[data-v-520b5d54] {\r\n  flex: 1;\r\n  min-width: 200px;\n}\n.skill-category h3[data-v-520b5d54] {\r\n  font-size: 1.2rem;\r\n  color: #E50914;\r\n  margin-bottom: 15px;\r\n  position: relative;\n}\n.skill-category h3[data-v-520b5d54]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 0;\r\n  bottom: -5px;\r\n  width: 30px;\r\n  height: 2px;\r\n  background-color: #E50914;\n}\nul[data-v-520b5d54] {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\n}\nli[data-v-520b5d54] {\r\n  padding: 5px 0;\r\n  color: #b3b3b3;\r\n  position: relative;\r\n  padding-left: 20px;\n}\nli[data-v-520b5d54]::before {\r\n  content: '\\2022';\r\n  color: #E50914;\r\n  position: absolute;\r\n  left: 0;\n}\n@media (max-width: 768px) {\n.about-content[data-v-520b5d54] {\r\n    flex-direction: column;\n}\n.about-image[data-v-520b5d54] {\r\n    flex: 0 0 auto;\n}\n.profile-image[data-v-520b5d54] {\r\n    height: 300px;\n}\n.skills-container[data-v-520b5d54] {\r\n    flex-direction: column;\r\n    gap: 20px;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.about-page[data-v-520b5d54] {\r\n  max-width: 1200px;\r\n  margin: 0 auto;\r\n  padding: 20px;\n}\n.page-title[data-v-520b5d54] {\r\n  font-size: 2.5rem;\r\n  margin-bottom: 40px;\r\n  position: relative;\r\n  display: block;\r\n  text-align: center;\r\n  width: 100%;\n}\n.page-title[data-v-520b5d54]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  bottom: -10px;\r\n  width: 60px;\r\n  height: 4px;\r\n  background-color: #E50914;\n}\n.about-content[data-v-520b5d54] {\r\n  display: flex;\r\n  gap: 40px;\n}\n.about-image[data-v-520b5d54] {\r\n  flex: 0 0 300px;\n}\n.profile-image[data-v-520b5d54] {\r\n  width: 100%;\r\n  height: 400px;\r\n  background-color: #333;\r\n  background-image: url('/images/about/Misril-about.jpg');\r\n  background-size: contain;\r\n  background-position: center;\r\n  background-repeat: no-repeat;\r\n  border-radius: 5px;\r\n  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);\n}\n.about-text[data-v-520b5d54] {\r\n  flex: 1;\n}\n.intro[data-v-520b5d54] {\r\n  font-size: 1.3rem;\r\n  line-height: 1.6;\r\n  margin-bottom: 30px;\r\n  color: #e5e5e5;\n}\n.section-title[data-v-520b5d54] {\r\n  font-size: 1.8rem;\r\n  margin: 30px 0 15px;\r\n  color: #e5e5e5;\n}\np[data-v-520b5d54] {\r\n  line-height: 1.6;\r\n  margin-bottom: 20px;\r\n  color: #b3b3b3;\n}\n.skills-container[data-v-520b5d54] {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  gap: 30px;\r\n  margin-top: 20px;\n}\n.skill-category[data-v-520b5d54] {\r\n  flex: 1;\r\n  min-width: 200px;\n}\n.skill-category h3[data-v-520b5d54] {\r\n  font-size: 1.2rem;\r\n  color: #E50914;\r\n  margin-bottom: 15px;\r\n  position: relative;\n}\n.skill-category h3[data-v-520b5d54]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 0;\r\n  bottom: -5px;\r\n  width: 30px;\r\n  height: 2px;\r\n  background-color: #E50914;\n}\nul[data-v-520b5d54] {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\n}\nli[data-v-520b5d54] {\r\n  padding: 5px 0;\r\n  color: #b3b3b3;\r\n  position: relative;\r\n  padding-left: 20px;\n}\nli[data-v-520b5d54]::before {\r\n  content: '\\2022';\r\n  color: #E50914;\r\n  position: absolute;\r\n  left: 0;\n}\n@media (max-width: 768px) {\n.about-content[data-v-520b5d54] {\r\n    flex-direction: column;\n}\n.about-image[data-v-520b5d54] {\r\n    flex: 0 0 auto;\r\n    margin-bottom: 30px;\r\n    width: 100%;\n}\n.profile-image[data-v-520b5d54] {\r\n    height: 350px;\r\n    max-width: 300px;\r\n    margin: 0 auto;\n}\n.skills-container[data-v-520b5d54] {\r\n    flex-direction: column;\r\n    gap: 20px;\n}\n}\n@media (max-width: 480px) {\n.profile-image[data-v-520b5d54] {\r\n    height: 300px;\n}\n}\r\n", ""]);
 
 // exports
 
@@ -8941,7 +9012,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.experience-page[data-v-2c2d66b3] {\r\n  max-width: 1200px;\r\n  margin: 0 auto;\r\n  padding: 20px;\r\n  margin-bottom: 30px;\n}\n.page-title[data-v-2c2d66b3] {\r\n  font-size: 2.5rem;\r\n  margin-bottom: 50px;\r\n  position: relative;\r\n  display: block;\r\n  text-align: center;\r\n  width: 100%;\r\n  color: #fff;\n}\n.page-title[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  bottom: -10px;\r\n  width: 60px;\r\n  height: 4px;\r\n  background-color: #E50914;\n}\n.experience-timeline[data-v-2c2d66b3] {\r\n  position: relative;\r\n  max-width: 1000px;\r\n  margin: 0 auto;\n}\n.experience-timeline[data-v-2c2d66b3]::before {\r\n  content: '';\r\n  position: absolute;\r\n  top: 0;\r\n  bottom: 0;\r\n  width: 4px;\r\n  background-color: #E50914;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  z-index: 0;\n}\n.timeline-item[data-v-2c2d66b3] {\r\n  padding: 10px 40px;\r\n  position: relative;\r\n  width: 50%;\r\n  box-sizing: border-box;\r\n  margin-bottom: 50px;\n}\n.timeline-marker[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  width: 60px;\r\n  height: 60px;\r\n  background-color: #68b612;\r\n  border-radius: 50%;\r\n  top: 15px;\r\n  right: -30px;\r\n  z-index: 2;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(229, 9, 20, 0.5);\n}\n.timeline-marker[data-v-2c2d66b3]::before {\r\n  content: attr(data-tooltip);\r\n  position: absolute;\r\n  background-color: rgba(0, 0, 0, 0.8);\r\n  color: white;\r\n  padding: 5px 10px;\r\n  border-radius: 5px;\r\n  font-size: 0.8rem;\r\n  visibility: hidden;\r\n  opacity: 0;\r\n  transition: all 0.3s ease;\r\n  width: -moz-max-content;\r\n  width: max-content;\n}\n.timeline-item:not(.right) .timeline-marker[data-v-2c2d66b3]::before {\r\n  right: 70px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3]::before {\r\n  left: 70px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\n}\n.timeline-marker[data-v-2c2d66b3]:hover::before {\r\n  visibility: visible;\r\n  opacity: 1;\n}\n.timeline-icon[data-v-2c2d66b3] {\r\n  width: 30px;\r\n  height: 30px;\r\n  filter: invert(100%);\n}\n.education-marker[data-v-2c2d66b3] {\r\n  background-color: #4479b1;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(0, 123, 255, 0.5);\n}\n.timeline-item.right[data-v-2c2d66b3] {\r\n  left: 50%;\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3] {\r\n  left: -30px;\r\n  right: auto;\n}\n.timeline-content[data-v-2c2d66b3] {\r\n  background-color: #b7f3b7;\r\n  padding: 20px;\r\n  border-radius: 10px;\r\n  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);\r\n  position: relative;\n}\n.timeline-content[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  width: 20px;\r\n  height: 20px;\r\n  background-color: inherit;\r\n  top: 20px;\r\n  transform: rotate(45deg);\r\n  z-index: 1;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3]::after {\r\n  right: -10px;\r\n  margin-right: 0px;\n}\n.timeline-item.right .timeline-content[data-v-2c2d66b3]::after {\r\n  left: -10px;\r\n  margin-left: 0px;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3] {\r\n  margin-right: 25px;\n}\n.timeline-item.right .timeline-content[data-v-2c2d66b3] {\r\n  margin-left: 25px;\n}\n.date-container[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  background-color: rgba(0, 0, 0, 0.7);\r\n  color: white;\r\n  padding: 6px 10px;\r\n  border-radius: 5px;\r\n  font-weight: bold;\r\n  z-index: 3;\r\n  border: 1px solid yellow;\r\n  font-size: 0.9rem;\r\n  width: -moz-max-content;\r\n  width: max-content;\n}\n.date-right[data-v-2c2d66b3] {\r\n  left: 85px;\n}\n.date-left[data-v-2c2d66b3] {\r\n  right: 85px;\n}\n.timeline-title[data-v-2c2d66b3] {\r\n  font-size: 1.5rem;\r\n  color: black;\r\n  margin: 0 0 5px;\n}\n.timeline-company[data-v-2c2d66b3] {\r\n  font-size: 1.1rem;\r\n  color: black;\r\n  margin: 0 0 15px;\r\n  font-weight: normal;\n}\n.timeline-description ul[data-v-2c2d66b3] {\r\n  margin: 0;\r\n  padding-left: 20px;\n}\n.timeline-description li[data-v-2c2d66b3] {\r\n  color: black;\r\n  margin-bottom: 10px;\r\n  line-height: 1.5;\n}\n.timeline-tech[data-v-2c2d66b3] {\r\n  margin-top: 20px;\n}\n.tech-title[data-v-2c2d66b3] {\r\n  display: block;\r\n  color: black;\r\n  margin-bottom: 8px;\n}\n.tech-tags[data-v-2c2d66b3] {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  gap: 8px;\n}\n.tech-tag[data-v-2c2d66b3] {\r\n  background-color: rgba(229, 9, 20, 0.2);\r\n  border: 1px solid #E50914;\r\n  color: #E50914;\r\n  padding: 5px 10px;\r\n  border-radius: 15px;\r\n  font-size: 0.8rem;\r\n  display: inline-block;\n}\n.star-marker[data-v-2c2d66b3] {\r\n  background-color: #ffd700;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(255, 215, 0, 0.5);\n}\n.timeline-end[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  bottom: 0;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  z-index: 5;\n}\n.timeline-content-study[data-v-2c2d66b3] {\r\n  background-color: #FFE5B4;\r\n  padding: 20px;\r\n  border-radius: 10px;\r\n  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);\r\n  position: relative;\n}\n.timeline-content-study[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  width: 20px;\r\n  height: 20px;\r\n  background-color: inherit;\r\n  top: 20px;\r\n  left: -10px;\r\n  transform: rotate(45deg);\r\n  z-index: 1;\r\n  margin-left: 0px;\n}\n@media (max-width: 768px) {\n.experience-timeline[data-v-2c2d66b3]::before {\r\n    left: 40px;\n}\n.timeline-item[data-v-2c2d66b3] {\r\n    width: 100%;\r\n    padding-left: 80px;\r\n    padding-right: 0;\n}\n.timeline-marker[data-v-2c2d66b3] {\r\n    left: 10px;\r\n    right: auto;\n}\n.timeline-item.right[data-v-2c2d66b3] {\r\n    left: 0;\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3] {\r\n    left: 10px;\n}\n.date-container[data-v-2c2d66b3] {\r\n    position: absolute;\r\n    top: -40px;\r\n    left: auto;\r\n    right: auto;\n}\n.date-left[data-v-2c2d66b3], .date-right[data-v-2c2d66b3] {\r\n    left: 60px;\n}\n.timeline-content[data-v-2c2d66b3]::after {\r\n    display: none;\n}\n.timeline-end[data-v-2c2d66b3] {\r\n    position: absolute;\r\n    bottom: -30px;\r\n    left: 40px;\r\n    transform: none;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3],\r\n  .timeline-item.right .timeline-content[data-v-2c2d66b3] {\r\n    margin-left: 0;\r\n    margin-right: 0;\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.experience-page[data-v-2c2d66b3] {\r\n  max-width: 1200px;\r\n  margin: 0 auto;\r\n  padding: 20px;\r\n  margin-bottom: 30px;\n}\n.page-title[data-v-2c2d66b3] {\r\n  font-size: 2.5rem;\r\n  margin-bottom: 50px;\r\n  position: relative;\r\n  display: block;\r\n  text-align: center;\r\n  width: 100%;\r\n  color: #fff;\n}\n.page-title[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  bottom: -10px;\r\n  width: 60px;\r\n  height: 4px;\r\n  background-color: #E50914;\n}\n.experience-timeline[data-v-2c2d66b3] {\r\n  position: relative;\r\n  max-width: 1000px;\r\n  margin: 0 auto;\n}\n.experience-timeline[data-v-2c2d66b3]::before {\r\n  content: '';\r\n  position: absolute;\r\n  top: 0;\r\n  bottom: 0;\r\n  width: 4px;\r\n  background-color: #E50914;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  z-index: 0;\n}\n.timeline-item[data-v-2c2d66b3] {\r\n  padding: 10px 40px;\r\n  position: relative;\r\n  width: 50%;\r\n  box-sizing: border-box;\r\n  margin-bottom: 50px;\n}\n.timeline-marker[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  width: 60px;\r\n  height: 60px;\r\n  background-color: #68b612;\r\n  border-radius: 50%;\r\n  top: 15px;\r\n  right: -30px;\r\n  z-index: 2;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(229, 9, 20, 0.5);\n}\n.timeline-marker[data-v-2c2d66b3]::before {\r\n  content: attr(data-tooltip);\r\n  position: absolute;\r\n  background-color: rgba(0, 0, 0, 0.8);\r\n  color: white;\r\n  padding: 5px 10px;\r\n  border-radius: 5px;\r\n  font-size: 0.8rem;\r\n  visibility: hidden;\r\n  opacity: 0;\r\n  transition: all 0.3s ease;\r\n  width: -moz-max-content;\r\n  width: max-content;\n}\n.timeline-item:not(.right) .timeline-marker[data-v-2c2d66b3]::before {\r\n  right: 70px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3]::before {\r\n  left: 70px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\n}\n.timeline-marker[data-v-2c2d66b3]:hover::before {\r\n  visibility: visible;\r\n  opacity: 1;\n}\n.timeline-icon[data-v-2c2d66b3] {\r\n  width: 30px;\r\n  height: 30px;\r\n  filter: invert(100%);\n}\n.education-marker[data-v-2c2d66b3] {\r\n  background-color: #4479b1;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(0, 123, 255, 0.5);\n}\n.timeline-item.right[data-v-2c2d66b3] {\r\n  left: 50%;\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3] {\r\n  left: -30px;\r\n  right: auto;\n}\n.timeline-content[data-v-2c2d66b3] {\r\n  background-color: #b7f3b7;\r\n  padding: 20px;\r\n  border-radius: 10px;\r\n  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);\r\n  position: relative;\n}\n.timeline-content[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  width: 20px;\r\n  height: 20px;\r\n  background-color: inherit;\r\n  top: 20px;\r\n  transform: rotate(45deg);\r\n  z-index: 1;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3]::after {\r\n  right: -10px;\r\n  margin-right: 0px;\n}\n.timeline-item.right .timeline-content[data-v-2c2d66b3]::after {\r\n  left: -10px;\r\n  margin-left: 0px;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3] {\r\n  margin-right: 25px;\n}\n.timeline-item.right .timeline-content[data-v-2c2d66b3] {\r\n  margin-left: 25px;\n}\n.date-container[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  background-color: rgba(0, 0, 0, 0.7);\r\n  color: white;\r\n  padding: 6px 10px;\r\n  border-radius: 5px;\r\n  font-weight: bold;\r\n  z-index: 3;\r\n  border: 1px solid yellow;\r\n  font-size: 0.9rem;\r\n  width: -moz-max-content;\r\n  width: max-content;\n}\n.date-right[data-v-2c2d66b3] {\r\n  left: 85px;\n}\n.date-left[data-v-2c2d66b3] {\r\n  right: 85px;\n}\n.timeline-title[data-v-2c2d66b3] {\r\n  font-size: 1.5rem;\r\n  color: black;\r\n  margin: 0 0 5px;\n}\n.timeline-company[data-v-2c2d66b3] {\r\n  font-size: 1.1rem;\r\n  color: black;\r\n  margin: 0 0 15px;\r\n  font-weight: normal;\n}\n.timeline-description ul[data-v-2c2d66b3] {\r\n  margin: 0;\r\n  padding-left: 20px;\n}\n.timeline-description li[data-v-2c2d66b3] {\r\n  color: black;\r\n  margin-bottom: 10px;\r\n  line-height: 1.5;\n}\n.timeline-tech[data-v-2c2d66b3] {\r\n  margin-top: 20px;\n}\n.tech-title[data-v-2c2d66b3] {\r\n  display: block;\r\n  color: black;\r\n  margin-bottom: 8px;\n}\n.tech-tags[data-v-2c2d66b3] {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  gap: 8px;\n}\n.tech-tag[data-v-2c2d66b3] {\r\n  background-color: rgba(229, 9, 20, 0.2);\r\n  border: 1px solid #E50914;\r\n  color: #E50914;\r\n  padding: 5px 10px;\r\n  border-radius: 15px;\r\n  font-size: 0.8rem;\r\n  display: inline-block;\n}\n.star-marker[data-v-2c2d66b3] {\r\n  background-color: #ffd700;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(255, 215, 0, 0.5);\r\n  position: relative;\r\n  z-index: 10;\n}\n.timeline-end[data-v-2c2d66b3] {\r\n  position: absolute;\r\n  bottom: -30px;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  z-index: 5;\n}\n.timeline-content-study[data-v-2c2d66b3] {\r\n  background-color: #FFE5B4;\r\n  padding: 20px;\r\n  border-radius: 10px;\r\n  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);\r\n  position: relative;\n}\n.over-marker[data-v-2c2d66b3] {\r\n  background-color: #ffd700 !important;\r\n  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(255, 215, 0, 0.5) !important;\n}\n.timeline-content-study[data-v-2c2d66b3]::after {\r\n  content: '';\r\n  position: absolute;\r\n  width: 20px;\r\n  height: 20px;\r\n  background-color: inherit;\r\n  top: 20px;\r\n  left: -10px;\r\n  transform: rotate(45deg);\r\n  z-index: 1;\r\n  margin-left: 0px;\n}\n@media (max-width: 768px) {\n.experience-timeline[data-v-2c2d66b3]::before {\r\n    left: 40px;\n}\n.timeline-item[data-v-2c2d66b3] {\r\n    width: 100%;\r\n    padding-left: 80px;\r\n    padding-right: 0;\n}\n.timeline-marker[data-v-2c2d66b3] {\r\n    left: 10px;\r\n    right: auto;\n}\n.timeline-item.right[data-v-2c2d66b3] {\r\n    left: 0;\n}\n.timeline-item.right .timeline-marker[data-v-2c2d66b3] {\r\n    left: 10px;\n}\n.date-container[data-v-2c2d66b3] {\r\n    position: absolute;\r\n    top: -40px;\r\n    left: auto;\r\n    right: auto;\n}\n.date-left[data-v-2c2d66b3], .date-right[data-v-2c2d66b3] {\r\n    left: 60px;\n}\n.timeline-content[data-v-2c2d66b3]::after {\r\n    display: none;\n}\n.timeline-end[data-v-2c2d66b3] {\r\n    position: absolute;\r\n    bottom: -30px;\r\n    left: 40px;\r\n    transform: none;\n}\n.timeline-item:not(.right) .timeline-content[data-v-2c2d66b3],\r\n  .timeline-item.right .timeline-content[data-v-2c2d66b3] {\r\n    margin-left: 0;\r\n    margin-right: 0;\n}\n.star-marker[data-v-2c2d66b3] {\r\n    left: 0;\r\n    position: relative;\n}\n}\r\n", ""]);
 
 // exports
 
@@ -8979,7 +9050,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.profile-home[data-v-76b3a9a2] {\n  margin-top: -80px;\n}\n.hero[data-v-76b3a9a2] {\n  height: 80vh;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 60%, rgba(20, 20, 20, 1) 100%), \n              url('/images/hero-bg.jpg') no-repeat center center;\n  background-size: cover;\n  display: flex;\n  align-items: center;\n  padding: 0 60px;\n  position: relative;\n}\n.hero-content[data-v-76b3a9a2] {\n  max-width: 650px;\n  position: relative;\n  z-index: 2;\n}\n.profile-greeting[data-v-76b3a9a2] {\n  font-size: 3.5rem;\n  margin-bottom: 10px;\n  font-weight: 700;\n}\n.profile-tagline[data-v-76b3a9a2] {\n  font-size: 1.5rem;\n  margin-bottom: 30px;\n  color: #ddd;\n}\n.hero-actions[data-v-76b3a9a2] {\n  display: flex;\n  gap: 15px;\n  margin-bottom: 20px;\n}\n.action-button[data-v-76b3a9a2] {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  padding: 12px 24px;\n  border-radius: 4px;\n  text-decoration: none;\n  font-weight: 600;\n  font-size: 1.1rem;\n  transition: all 0.3s ease;\n  border: none;\n  cursor: pointer;\n}\n.action-button i[data-v-76b3a9a2] {\n  margin-right: 8px;\n}\n.primary[data-v-76b3a9a2] {\n  background-color: #E50914;\n  color: white;\n}\n.primary[data-v-76b3a9a2]:hover {\n  background-color: #f40612;\n  transform: scale(1.05);\n}\n.secondary[data-v-76b3a9a2] {\n  background-color: rgba(255, 255, 255, 0.2);\n  color: white;\n}\n.secondary[data-v-76b3a9a2]:hover {\n  background-color: rgba(255, 255, 255, 0.3);\n}\n.info-box[data-v-76b3a9a2] {\n  background-color: rgba(20, 20, 20, 0.8);\n  border-left: 4px solid #E50914;\n  padding: 15px 20px;\n  border-radius: 4px;\n  margin-top: 20px;\n  animation: fadeIn-76b3a9a2 0.3s ease-in-out;\n}\n@keyframes fadeIn-76b3a9a2 {\nfrom { opacity: 0; transform: translateY(-10px);\n}\nto { opacity: 1; transform: translateY(0);\n}\n}\n\n/* .content-row {\n  padding: 20px 20px;\n} */\n.continue-top-picks[data-v-76b3a9a2]{\n  padding: 20px 20px 0px 20px;\n}\n.continue-watching[data-v-76b3a9a2]{\n  padding: 0px 20px 20px 20px;\n}\n.row-title[data-v-76b3a9a2] {\n  font-size: 1.8rem;\n  margin-bottom: 20px;\n  font-weight: 600;\n}\n.content-slider[data-v-76b3a9a2] {\n  display: flex;\n  gap: 20px;\n  overflow-x: auto;\n  padding: 10px 0 30px;\n  scroll-behavior: smooth;\n  scrollbar-width: none; /* Firefox */\n  -ms-overflow-style: none; /* IE and Edge */\n}\n.content-slider[data-v-76b3a9a2]::-webkit-scrollbar {\n  display: none; /* Chrome, Safari and Opera */\n}\n.content-item[data-v-76b3a9a2] {\n  flex: 0 0 300px;\n  transition: transform 0.3s ease;\n  cursor: pointer;\n}\n.content-item[data-v-76b3a9a2]:hover {\n  transform: scale(1.05);\n  z-index: 10;\n}\n.content-card[data-v-76b3a9a2] {\n  position: relative;\n  border-radius: 6px;\n  overflow: hidden;\n  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);\n  background-color: #333;\n  height: 170px;\n}\n.card-image[data-v-76b3a9a2] {\n  width: 100%;\n  height: 150px;\n  background-size: cover;\n  background-position: center;\n  background-repeat: no-repeat;\n  border-radius: 4px 4px 0 0;\n  position: relative;\n  transition: transform 0.3s ease;\n}\n.content-item:hover .card-image[data-v-76b3a9a2] {\n  transform: scale(1.1);\n}\n.card-info[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);\n  padding: 20px 15px 15px;\n  transition: transform 0.3s ease;\n  padding-bottom: 30px;\n}\n.card-info h3[data-v-76b3a9a2] {\n  margin: 0 0 5px 0;\n  font-size: 1.2rem;\n}\n.item-meta[data-v-76b3a9a2] {\n  font-size: 0.9rem;\n  color: #ccc;\n}\n.progress-bar[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background-color: #555;\n  z-index: 5;\n}\n.progress[data-v-76b3a9a2] {\n  height: 100%;\n  background-color: #E50914;\n}\n\n/* .featured-gif {\n  padding: 0 60px 60px;\n} */\n.gif-container[data-v-76b3a9a2] {\n  position: relative;\n  border-radius: 8px;\n  overflow: hidden;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);\n  margin-top: 50px;\n  height: 70vh;\n}\n.featured-image[data-v-76b3a9a2] {\n  width: 100%;\n  display: block;\n}\n.gif-overlay[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);\n  padding: 80px 40px 20px;\n}\n.overlay-content h2[data-v-76b3a9a2] {\n  font-size: 2rem;\n  margin-bottom: 15px;\n}\n.overlay-content p[data-v-76b3a9a2] {\n  font-size: 1.1rem;\n  color: #ccc;\n  margin-bottom: 20px;\n  max-width: 800px;\n}\n.overlay-actions[data-v-76b3a9a2] {\n  display: flex;\n  gap: 15px;\n}\n.resume[data-v-76b3a9a2]{\n  background-color: white !important;\n  color: black !important;\n}\n.resume[data-v-76b3a9a2]:hover {\n  background-color: #909090 !important;\n}\n.linkedin[data-v-76b3a9a2]{\n  background-color: #0077b5;\n  color: white;\n}\n.overlay-button[data-v-76b3a9a2] {\n  background-color: rgba(255, 255, 255, 0.2);\n  color: white;\n  border: none;\n  border-radius: 4px;\n  padding: 10px 20px;\n  font-size: 1rem;\n  cursor: pointer;\n  transition: background-color 0.3s ease;\n  display: flex;\n  align-items: center;\n}\n.overlay-button[data-v-76b3a9a2]:hover {\n  background-color: rgba(255, 255, 255, 0.3);\n}\n.overlay-button i[data-v-76b3a9a2] {\n  margin-right: 8px;\n}\n.button-icon[data-v-76b3a9a2] {\n  width: 16px;\n  height: 16px;\n  margin-right: 8px;\n  /* filter: invert(100%); */\n}\n@media (max-width: 768px) {\n.hero[data-v-76b3a9a2] {\n    padding: 0 30px;\n    height: 70vh;\n}\n.profile-greeting[data-v-76b3a9a2] {\n    font-size: 2.5rem;\n}\n.profile-tagline[data-v-76b3a9a2] {\n    font-size: 1.2rem;\n}\n  \n  /* .content-row {\n    padding: 20px 30px;\n  } */\n.content-item[data-v-76b3a9a2] {\n    flex: 0 0 250px;\n}\n  \n  /* .featured-gif {\n    padding: 0 30px 40px;\n  } */\n.gif-overlay[data-v-76b3a9a2] {\n    padding: 60px 30px 30px;\n}\n.overlay-content h2[data-v-76b3a9a2] {\n    font-size: 1.6rem;\n}\n.overlay-content p[data-v-76b3a9a2] {\n    font-size: 1rem;\n}\n}\n@media (max-width: 480px) {\n.hero-actions[data-v-76b3a9a2] {\n    flex-direction: column;\n}\n.action-button[data-v-76b3a9a2] {\n    width: 100%;\n}\n.content-item[data-v-76b3a9a2] {\n    flex: 0 0 220px;\n}\n.overlay-actions[data-v-76b3a9a2] {\n    flex-direction: column;\n}\n.overlay-button[data-v-76b3a9a2] {\n    width: 100%;\n}\n}\n", ""]);
+exports.push([module.i, "\n.profile-home[data-v-76b3a9a2] {\n  margin-top: -80px;\n}\n.hero[data-v-76b3a9a2] {\n  height: 80vh;\n  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 60%, rgba(20, 20, 20, 1) 100%), \n              url('/images/hero-bg.jpg') no-repeat center center;\n  background-size: cover;\n  display: flex;\n  align-items: center;\n  padding: 0 60px;\n  position: relative;\n}\n.hero-content[data-v-76b3a9a2] {\n  max-width: 650px;\n  position: relative;\n  z-index: 2;\n}\n.profile-greeting[data-v-76b3a9a2] {\n  font-size: 3.5rem;\n  margin-bottom: 10px;\n  font-weight: 700;\n}\n.profile-tagline[data-v-76b3a9a2] {\n  font-size: 1.5rem;\n  margin-bottom: 30px;\n  color: #ddd;\n}\n.hero-actions[data-v-76b3a9a2] {\n  display: flex;\n  gap: 15px;\n  margin-bottom: 20px;\n}\n.action-button[data-v-76b3a9a2] {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  padding: 12px 24px;\n  border-radius: 4px;\n  text-decoration: none;\n  font-weight: 600;\n  font-size: 1.1rem;\n  transition: all 0.3s ease;\n  border: none;\n  cursor: pointer;\n}\n.action-button i[data-v-76b3a9a2] {\n  margin-right: 8px;\n}\n.primary[data-v-76b3a9a2] {\n  background-color: #E50914;\n  color: white;\n}\n.primary[data-v-76b3a9a2]:hover {\n  background-color: #f40612;\n  transform: scale(1.05);\n}\n.secondary[data-v-76b3a9a2] {\n  background-color: rgba(255, 255, 255, 0.2);\n  color: white;\n}\n.secondary[data-v-76b3a9a2]:hover {\n  background-color: rgba(255, 255, 255, 0.3);\n}\n.info-box[data-v-76b3a9a2] {\n  background-color: rgba(20, 20, 20, 0.8);\n  border-left: 4px solid #E50914;\n  padding: 15px 20px;\n  border-radius: 4px;\n  margin-top: 20px;\n  animation: fadeIn-76b3a9a2 0.3s ease-in-out;\n}\n@keyframes fadeIn-76b3a9a2 {\nfrom { opacity: 0; transform: translateY(-10px);\n}\nto { opacity: 1; transform: translateY(0);\n}\n}\n\n/* .content-row {\n  padding: 20px 20px;\n} */\n.continue-top-picks[data-v-76b3a9a2] {\n  padding: 20px 20px 0px 20px;\n}\n.continue-top-picks .content-slider[data-v-76b3a9a2] {\n  overflow-x: auto;\n  padding-bottom: 10px;\n  margin-bottom: 20px;\n}\n\n/* Hide scrollbar for top picks section only */\n.continue-top-picks .content-slider[data-v-76b3a9a2]::-webkit-scrollbar {\n  display: none;\n}\n.continue-top-picks .content-slider[data-v-76b3a9a2] {\n  -ms-overflow-style: none;  /* IE and Edge */\n  scrollbar-width: none;  /* Firefox */\n}\n.continue-watching[data-v-76b3a9a2] {\n  padding: 0px 20px 20px 20px;\n}\n.row-title[data-v-76b3a9a2] {\n  font-size: 1.8rem;\n  margin-bottom: 20px;\n  font-weight: 600;\n}\n.content-slider[data-v-76b3a9a2] {\n  display: flex;\n  gap: 20px;\n  overflow-x: auto;\n  padding: 10px 0 30px;\n  scroll-behavior: smooth;\n  /* We'll still keep these for browsers that don't support the custom scrollbar */\n  scrollbar-width: thin;\n  -ms-overflow-style: none;\n}\n\n/* Only hide the scrollbar on browsers that support the custom styling */\n@supports (scrollbar-width: thin) or (-webkit-scrollbar: 8px) {\n.content-slider[data-v-76b3a9a2]::-webkit-scrollbar {\n    height: 6px;\n}\n.content-slider[data-v-76b3a9a2]::-webkit-scrollbar-track {\n    background: transparent;\n    margin: 0 60px;\n}\n.content-slider[data-v-76b3a9a2]::-webkit-scrollbar-thumb {\n    background: #E50914;\n    border-radius: 3px;\n}\n.content-slider[data-v-76b3a9a2]::-webkit-scrollbar-thumb:hover {\n    background: #FF0F1F;\n}\n}\n.content-item[data-v-76b3a9a2] {\n  flex: 0 0 300px;\n  transition: transform 0.3s ease;\n  cursor: pointer;\n}\n.content-item[data-v-76b3a9a2]:hover {\n  transform: scale(1.05);\n  z-index: 10;\n}\n.content-card[data-v-76b3a9a2] {\n  position: relative;\n  border-radius: 6px;\n  overflow: hidden;\n  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);\n  background-color: #333;\n  height: 170px;\n}\n.card-image[data-v-76b3a9a2] {\n  width: 100%;\n  height: 150px;\n  background-size: cover;\n  background-position: center;\n  background-repeat: no-repeat;\n  border-radius: 4px 4px 0 0;\n  position: relative;\n  transition: transform 0.3s ease;\n}\n.content-item:hover .card-image[data-v-76b3a9a2] {\n  transform: scale(1.1);\n}\n.card-info[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);\n  padding: 20px 15px 15px;\n  transition: transform 0.3s ease;\n  padding-bottom: 30px;\n}\n.card-info h3[data-v-76b3a9a2] {\n  margin: 0 0 5px 0;\n  font-size: 1.2rem;\n}\n.item-meta[data-v-76b3a9a2] {\n  font-size: 0.9rem;\n  color: #ccc;\n}\n.progress-bar[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background-color: #555;\n  z-index: 5;\n}\n.progress[data-v-76b3a9a2] {\n  height: 100%;\n  background-color: #E50914;\n}\n\n/* .featured-gif {\n  padding: 0 60px 60px;\n} */\n.gif-container[data-v-76b3a9a2] {\n  position: relative;\n  border-radius: 8px;\n  overflow: hidden;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);\n  margin-top: 50px;\n  height: 70vh;\n}\n.featured-image[data-v-76b3a9a2] {\n  width: 100%;\n  display: block;\n}\n.gif-overlay[data-v-76b3a9a2] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);\n  padding: 80px 40px 20px;\n}\n.overlay-content h2[data-v-76b3a9a2] {\n  font-size: 2rem;\n  margin-bottom: 15px;\n}\n.overlay-content p[data-v-76b3a9a2] {\n  font-size: 1.1rem;\n  color: #ccc;\n  margin-bottom: 20px;\n  max-width: 800px;\n}\n.overlay-actions[data-v-76b3a9a2] {\n  display: flex;\n  gap: 15px;\n}\n.resume[data-v-76b3a9a2]{\n  background-color: white !important;\n  color: black !important;\n}\n.resume[data-v-76b3a9a2]:hover {\n  background-color: #909090 !important;\n}\n.linkedin[data-v-76b3a9a2]{\n  background-color: #0077b5;\n  color: white;\n}\n.overlay-button[data-v-76b3a9a2] {\n  background-color: rgba(255, 255, 255, 0.2);\n  color: white;\n  border: none;\n  border-radius: 4px;\n  padding: 10px 20px;\n  font-size: 1rem;\n  cursor: pointer;\n  transition: background-color 0.3s ease;\n  display: flex;\n  align-items: center;\n}\n.overlay-button[data-v-76b3a9a2]:hover {\n  background-color: rgba(255, 255, 255, 0.3);\n}\n.overlay-button i[data-v-76b3a9a2] {\n  margin-right: 8px;\n}\n.button-icon[data-v-76b3a9a2] {\n  width: 16px;\n  height: 16px;\n  margin-right: 8px;\n  /* filter: invert(100%); */\n}\n@media (max-width: 768px) {\n.hero[data-v-76b3a9a2] {\n    padding: 0 30px;\n    height: 70vh;\n}\n.profile-greeting[data-v-76b3a9a2] {\n    font-size: 2.5rem;\n}\n.profile-tagline[data-v-76b3a9a2] {\n    font-size: 1.2rem;\n}\n  \n  /* .content-row {\n    padding: 20px 30px;\n  } */\n.content-item[data-v-76b3a9a2] {\n    flex: 0 0 250px;\n}\n  \n  /* .featured-gif {\n    padding: 0 30px 40px;\n  } */\n.gif-overlay[data-v-76b3a9a2] {\n    padding: 60px 30px 30px;\n}\n.overlay-content h2[data-v-76b3a9a2] {\n    font-size: 1.6rem;\n}\n.overlay-content p[data-v-76b3a9a2] {\n    font-size: 1rem;\n}\n}\n@media (max-width: 480px) {\n.hero-actions[data-v-76b3a9a2] {\n    flex-direction: column;\n}\n.action-button[data-v-76b3a9a2] {\n    width: 100%;\n}\n.content-item[data-v-76b3a9a2] {\n    flex: 0 0 220px;\n}\n.overlay-actions[data-v-76b3a9a2] {\n    flex-direction: column;\n}\n  \n  /* .overlay-button {\n    width: 100%;\n  } */\n}\n", ""]);
 
 // exports
 

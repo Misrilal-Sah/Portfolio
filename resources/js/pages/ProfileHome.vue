@@ -95,8 +95,8 @@ export default {
           topPicks: [
             { title: 'Work History', type: 'Experience', section: 'experience', image: '/images/cards/work-experience.jpg' },
             { title: 'Skills', type: 'Technical Skills', section: 'skills', image: '/images/cards/skills.jpg' },
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
             { title: 'Hire Me', type: 'Get in Touch', section: 'contact', image: '/images/cards/contact_me.jpg' },
-            { title: 'Certifications', type: 'Professional Development', section: 'about', image: '/images/cards/certification.jpg' },
           ],
           continueWatching: [
             { title: 'About Me', type: 'Personal Info', section: 'about', image: '/images/cards/about_me.jpg' },
@@ -115,6 +115,7 @@ export default {
           continueWatching: [
             { title: 'Tech Stack', section: 'skills', progress: 60, image: '/images/cards/skills.jpg' },
             { title: 'Project Showcase', section: 'projects', progress: 80, image: '/images/cards/projects.jpg' },
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
           ]
         },
         red: {
@@ -127,6 +128,7 @@ export default {
             { title: 'Personal Projects', type: 'Portfolio', section: 'projects', image: '/images/cards/projects.jpg' },
           ],
           continueWatching: [
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
             { title: 'Tech Stack', section: 'skills', progress: 60, image: '/images/cards/skills.jpg' },
             { title: 'Recent Work', section: 'experience', progress: 55, image: '/images/cards/work-experience.jpg' },
           ]
@@ -136,7 +138,7 @@ export default {
           recommended: 'projects',
           topPicks: [
             { title: 'Exciting Projects', type: 'Innovations', section: 'projects', image: '/images/cards/projects.jpg' },
-            { title: 'Journey', type: 'Career Adventure', section: 'experience', image: '/images/cards/work-experience.jpg' },
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
             { title: 'Tech Explorer', type: 'Skills', section: 'skills', image: '/images/cards/skills.jpg' },
             { title: 'Connect', type: 'Collaboration', section: 'contact', image: '/images/cards/contact_me.jpg' },
           ],
@@ -151,7 +153,9 @@ export default {
   },
   computed: {
     profileType() {
-      return this.$route.params.type || 'blue';
+      const type = this.$route.params.type || 'blue';
+      localStorage.setItem('profileType', type);
+      return type;
     },
     profileName() {
       return this.profileData[this.profileType]?.name || 'Visitor';
@@ -272,11 +276,27 @@ export default {
   padding: 20px 20px;
 } */
 
-.continue-top-picks{
+.continue-top-picks {
   padding: 20px 20px 0px 20px;
 }
 
-.continue-watching{
+.continue-top-picks .content-slider {
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* Hide scrollbar for top picks section only */
+.continue-top-picks .content-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.continue-top-picks .content-slider {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.continue-watching {
   padding: 0px 20px 20px 20px;
 }
 
@@ -292,12 +312,30 @@ export default {
   overflow-x: auto;
   padding: 10px 0 30px;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  /* We'll still keep these for browsers that don't support the custom scrollbar */
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
 }
 
-.content-slider::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+/* Only hide the scrollbar on browsers that support the custom styling */
+@supports (scrollbar-width: thin) or (-webkit-scrollbar: 8px) {
+  .content-slider::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .content-slider::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 0 60px;
+  }
+  
+  .content-slider::-webkit-scrollbar-thumb {
+    background: #E50914;
+    border-radius: 3px;
+  }
+  
+  .content-slider::-webkit-scrollbar-thumb:hover {
+    background: #FF0F1F;
+  }
 }
 
 .content-item {
@@ -513,8 +551,8 @@ export default {
     flex-direction: column;
   }
   
-  .overlay-button {
+  /* .overlay-button {
     width: 100%;
-  }
+  } */
 }
 </style> 

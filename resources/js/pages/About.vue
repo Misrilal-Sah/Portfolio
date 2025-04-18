@@ -135,8 +135,9 @@ export default {
   height: 400px;
   background-color: #333;
   background-image: url('/images/about/Misril-about.jpg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   border-radius: 5px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
@@ -220,15 +221,25 @@ li::before {
   
   .about-image {
     flex: 0 0 auto;
+    margin-bottom: 30px;
+    width: 100%;
   }
   
   .profile-image {
-    height: 300px;
+    height: 350px;
+    max-width: 300px;
+    margin: 0 auto;
   }
   
   .skills-container {
     flex-direction: column;
     gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-image {
+    height: 300px;
   }
 }
 </style> 

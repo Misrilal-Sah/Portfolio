@@ -39,6 +39,8 @@ export default {
   name: 'Browse',
   methods: {
     navigateToProfile(profileType) {
+      // Store the selected profile type in localStorage
+      localStorage.setItem('profileType', profileType);
       this.$router.push({ name: 'profile-home', params: { type: profileType } });
     }
   }

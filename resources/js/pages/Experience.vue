@@ -52,12 +52,19 @@
         </div>
       </div>
       
-      <!-- Just the star marker at the end -->
-      <div class="timeline-end">
-        <div class="timeline-marker star-marker" data-tooltip="Career Start">
+      
+      <div class="timeline-item right">
+        <div class="timeline-marker education-marker over-marker" data-tooltip="Education">
           <img src="/images/work-experience/start.svg" alt="Star" class="timeline-icon">
         </div>
       </div>
+      
+      <!-- Just the star marker at the end -->
+      <!-- <div class="timeline-end">
+        <div class="timeline-marker star-marker" data-tooltip="Career Start">
+          <img src="/images/work-experience/start.svg" alt="Star" class="timeline-icon">
+        </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -362,11 +369,13 @@ export default {
 .star-marker {
   background-color: #ffd700;
   box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(255, 215, 0, 0.5);
+  position: relative;
+  z-index: 10;
 }
 
 .timeline-end {
   position: absolute;
-  bottom: 0;
+  bottom: -30px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -378,6 +387,11 @@ export default {
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
   position: relative;
+}
+
+.over-marker {
+  background-color: #ffd700 !important;
+  box-shadow: 0 0 0 4px #141414, 0 0 0 8px rgba(255, 215, 0, 0.5) !important;
 }
 
 .timeline-content-study::after {
@@ -443,6 +457,11 @@ export default {
   .timeline-item.right .timeline-content {
     margin-left: 0;
     margin-right: 0;
+  }
+  
+  .star-marker {
+    left: 0;
+    position: relative;
   }
 }
 </style> 
