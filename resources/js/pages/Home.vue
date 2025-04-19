@@ -1,5 +1,5 @@
 <template>
-  <div class="intro-page">
+  <div class="intro-page" @click="goToBrowse">
     <div class="netflix-intro" @click="goToBrowse">
       <img src="/images/logo-2.png" alt="Netflix Portfolio" class="netflix-logo" :class="{ 'animate': isAnimating }">
       <div v-if="showOverlay" class="overlay"></div>

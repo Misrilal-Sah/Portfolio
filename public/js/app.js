@@ -4128,7 +4128,10 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "intro-page"
+    staticClass: "intro-page",
+    on: {
+      click: _vm.goToBrowse
+    }
   }, [_c("div", {
     staticClass: "netflix-intro",
     on: {
