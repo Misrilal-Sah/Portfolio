@@ -48,7 +48,7 @@ class ContactController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'errors' => $validator->errors(),
-                    'debug' => $debug
+                    // 'debug' => $debug
                 ], 422);
             }
     
@@ -69,7 +69,7 @@ class ContactController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'message' => 'reCAPTCHA verification failed. Please try again.',
-                        'debug' => $debug
+                        // 'debug' => $debug
                     ], 400);
                 }
                 
@@ -97,7 +97,7 @@ class ContactController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Your message has been sent successfully! We\'ll get back to you soon.',
-                    'debug' => $debug
+                    // 'debug' => $debug
                 ]);
             } catch (\Exception $e) {
                 // Log mail sending error
@@ -115,7 +115,7 @@ class ContactController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Failed to send email: ' . $e->getMessage(),
-                    'debug' => $debug
+                    // 'debug' => $debug
                 ], 500);
             }
         } catch (\Exception $e) {
@@ -133,7 +133,7 @@ class ContactController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred: ' . $e->getMessage(),
-                'debug' => $debug
+                // 'debug' => $debug
             ], 500);
         }
     }
