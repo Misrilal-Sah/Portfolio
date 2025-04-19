@@ -99,7 +99,7 @@ export default {
             { title: 'Hire Me', type: 'Get in Touch', section: 'contact', image: '/images/cards/contact_me.jpg' },
           ],
           continueWatching: [
-            { title: 'About Me', type: 'Personal Info', section: 'about', image: '/images/cards/about_me.jpg' },
+            { title: 'About Me', type: 'Personal Info', section: 'about', progress: 73, image: '/images/cards/about_me.jpg' },
             { title: 'Project Gallery', section: 'projects', progress: 45, image: '/images/cards/projects.jpg' },
           ]
         },
@@ -115,7 +115,7 @@ export default {
           continueWatching: [
             { title: 'Tech Stack', section: 'skills', progress: 60, image: '/images/cards/skills.jpg' },
             { title: 'Project Showcase', section: 'projects', progress: 80, image: '/images/cards/projects.jpg' },
-            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', progress: 24, image: '/images/cards/certification.jpg' },
           ]
         },
         red: {
@@ -128,7 +128,7 @@ export default {
             { title: 'Personal Projects', type: 'Portfolio', section: 'projects', image: '/images/cards/projects.jpg' },
           ],
           continueWatching: [
-            { title: 'Certifications', type: 'Professional Development', section: 'certifications', image: '/images/cards/certification.jpg' },
+            { title: 'Certifications', type: 'Professional Development', section: 'certifications', progress: 27, image: '/images/cards/certification.jpg' },
             { title: 'Tech Stack', section: 'skills', progress: 60, image: '/images/cards/skills.jpg' },
             { title: 'Recent Work', section: 'experience', progress: 55, image: '/images/cards/work-experience.jpg' },
           ]
@@ -292,6 +292,16 @@ export default {
 }
 
 .continue-top-picks .content-slider {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for continue-watching section only */
+.continue-watching .content-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.continue-watching .content-slider {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
