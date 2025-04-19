@@ -2615,6 +2615,7 @@ __webpack_require__.r(__webpack_exports__);
             title: 'Certifications',
             type: 'Professional Development',
             section: 'certifications',
+            progress: 27,
             image: '/images/cards/certification.jpg'
           }, {
             title: 'Tech Stack',

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 use App\Mail\ContactFormMail;
 
 class ContactController extends Controller
@@ -95,19 +95,24 @@ class ContactController extends Controller
     private function verifyRecaptcha($token)
     {
         try {
-            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                // Using reCAPTCHA v2 Checkbox secret key
-                'secret' => '6Lc73xsrAAAAAISVG1PKra_Tm1WSe08KZPP09WI7',
-                'response' => $token,
-                'remoteip' => request()->ip()
+            Log::info('Verifying reCAPTCHA token...');
+            
+            $client = new Client();
+            $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
+                'form_params' => [
+                    'secret' => env('RECAPTCHA_SECRET_KEY', '6Lc73xsrAAAAAISVG1PKra_Tm1WSe08KZPP09WI7'),
+                    'response' => $token,
+                    'remoteip' => request()->ip()
+                ]
             ]);
             
-            $body = $response->json();
+            $body = json_decode($response->getBody(), true);
+            Log::info('reCAPTCHA response:', $body ?? []);
             
-            // For v2 Checkbox, we only care about success, not score
             return $body['success'] ?? false;
         } catch (\Exception $e) {
             Log::error('reCAPTCHA verification failed: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
             return false;
         }
     }
