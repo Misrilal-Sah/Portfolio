@@ -20,7 +20,19 @@ class ContactController extends Controller
      */
     public function sendMail(Request $request)
     {
+        // Initialize debug array
+        $debug = [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'environment' => app()->environment(),
+            'steps' => [],
+            'mail_config' => $this->getMailConfig(),
+            'errors' => []
+        ];
+    
         try {
+            // Step 1: Validation
+            $debug['steps'][] = 'Starting form validation';
+            
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
@@ -28,62 +40,121 @@ class ContactController extends Controller
                 'message' => 'required|string|min:10',
                 'recaptcha_token' => 'required|string',
             ]);
-
+    
             if ($validator->fails()) {
+                $debug['steps'][] = 'Validation failed';
+                $debug['errors'][] = $validator->errors()->toArray();
+                
                 return response()->json([
                     'status' => 'error',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
+                    'debug' => $debug
                 ], 422);
             }
-
-            // Skip reCAPTCHA verification in local environment
+    
+            $debug['steps'][] = 'Validation passed';
+    
+            // Step 2: reCAPTCHA
+            $debug['steps'][] = 'Checking reCAPTCHA';
             $recaptchaVerified = true;
             
-            // Only verify reCAPTCHA in non-local environments
             if (app()->environment() !== 'local') {
+                $debug['steps'][] = 'Verifying reCAPTCHA token';
                 $recaptchaVerified = $this->verifyRecaptcha($request->recaptcha_token);
+                $debug['recaptcha_verified'] = $recaptchaVerified;
                 
                 if (!$recaptchaVerified) {
+                    $debug['steps'][] = 'reCAPTCHA verification failed';
+                    
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'reCAPTCHA verification failed. Please try again.'
+                        'message' => 'reCAPTCHA verification failed. Please try again.',
+                        'debug' => $debug
                     ], 400);
                 }
+                
+                $debug['steps'][] = 'reCAPTCHA verification passed';
+            } else {
+                $debug['steps'][] = 'Skipping reCAPTCHA (local environment)';
             }
             
-            // Always log the form submission
-            $this->logContactSubmission($request);
-
-            // Try to send the email
+            // Step 3: Log submission
+            $debug['steps'][] = 'Logging contact submission';
+            $logResult = $this->logContactSubmission($request);
+            $debug['log_success'] = $logResult;
+    
+            // Step 4: Send email
+            $debug['steps'][] = 'Attempting to send email';
+            
             try {
-                $toEmail = env('MAIL_TO_ADDRESS', 'misrilalsah09@gmail.com');
+                $toEmail = env('MAIL_TO_ADDRESS', 'misrilalsah10@gmail.com');
+                $debug['to_email'] = $toEmail;
                 
+                $debug['steps'][] = 'Sending email via Mail::to()->send()';
                 Mail::to($toEmail)->send(new ContactFormMail($request->all()));
-
+                $debug['steps'][] = 'Email sent successfully';
+    
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Your message has been sent successfully! We\'ll get back to you soon.'
+                    'message' => 'Your message has been sent successfully! We\'ll get back to you soon.',
+                    'debug' => $debug
                 ]);
             } catch (\Exception $e) {
                 // Log mail sending error
+                $debug['steps'][] = 'Exception during email sending';
+                $debug['mail_error'] = [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ];
+                
                 Log::error('Mail sending failed: ' . $e->getMessage());
                 Log::error($e->getTraceAsString());
                 
                 return response()->json([
-                    'status' => 'success',
-                    'message' => 'Your message has been received! Our team will contact you shortly.'
-                ]);
+                    'status' => 'error',
+                    'message' => 'Failed to send email: ' . $e->getMessage(),
+                    'debug' => $debug
+                ], 500);
             }
         } catch (\Exception $e) {
+            $debug['steps'][] = 'General exception occurred';
+            $debug['error'] = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ];
+            
             Log::error('Contact form submission failed: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
             
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while processing your request. Please try again later.',
-                'debug' => config('app.debug') ? $e->getMessage() : null
+                'message' => 'An error occurred: ' . $e->getMessage(),
+                'debug' => $debug
             ], 500);
         }
+    }
+    
+    /**
+     * Get mail configuration for debugging
+     * 
+     * @return array
+     */
+    private function getMailConfig()
+    {
+        return [
+            'driver' => config('mail.default'),
+            'host' => config('mail.mailers.' . config('mail.default') . '.host', 'Not set'),
+            'port' => config('mail.mailers.' . config('mail.default') . '.port', 'Not set'),
+            'from_address' => config('mail.from.address', 'Not set'),
+            'encryption' => config('mail.mailers.' . config('mail.default') . '.encryption', 'Not set'),
+            'username' => config('mail.mailers.' . config('mail.default') . '.username', 'Not set'),
+            'has_password' => !empty(config('mail.mailers.' . config('mail.default') . '.password')),
+            'to_address' => env('MAIL_TO_ADDRESS', 'misrilalsah10@gmail.com')
+        ];
     }
 
     /**
