@@ -20,68 +20,69 @@ class ContactController extends Controller
      */
     public function sendMail(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|min:10',
-            'recaptcha_token' => 'required|string',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string|min:10',
+                'recaptcha_token' => 'required|string',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Skip reCAPTCHA verification in local environment
-        $recaptchaVerified = true;
-        
-        // Only verify reCAPTCHA in non-local environments
-        if (app()->environment() !== 'local') {
-            $recaptchaVerified = $this->verifyRecaptcha($request->recaptcha_token);
-            
-            if (!$recaptchaVerified) {
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'reCAPTCHA verification failed. Please try again.'
-                ], 400);
+                    'errors' => $validator->errors()
+                ], 422);
             }
-        }
-        
-        // Always log the form submission
-        $this->logContactSubmission($request);
 
-        // Try to send the email
-        try {
-            $toEmail = env('MAIL_TO_ADDRESS', 'newtestaccount91231236test@mailinator.com');
+            // Skip reCAPTCHA verification in local environment
+            $recaptchaVerified = true;
             
-            Mail::to($toEmail)->send(new ContactFormMail($request->all()));
+            // Only verify reCAPTCHA in non-local environments
+            if (app()->environment() !== 'local') {
+                $recaptchaVerified = $this->verifyRecaptcha($request->recaptcha_token);
+                
+                if (!$recaptchaVerified) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'reCAPTCHA verification failed. Please try again.'
+                    ], 400);
+                }
+            }
+            
+            // Always log the form submission
+            $this->logContactSubmission($request);
 
-            // Check if email was sent
-            $failures = Mail::failures();
-            if (count($failures) > 0) {
-                // Mail failed, but we have logged it
+            // Try to send the email
+            try {
+                $toEmail = env('MAIL_TO_ADDRESS', 'misrilalsah09@gmail.com');
+                
+                Mail::to($toEmail)->send(new ContactFormMail($request->all()));
+
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Your message has been received and logged. We\'ll get back to you soon!'
+                    'message' => 'Your message has been sent successfully! We\'ll get back to you soon.'
+                ]);
+            } catch (\Exception $e) {
+                // Log mail sending error
+                Log::error('Mail sending failed: ' . $e->getMessage());
+                Log::error($e->getTraceAsString());
+                
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Your message has been received! Our team will contact you shortly.'
                 ]);
             }
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Your message has been sent successfully! We\'ll get back to you soon.'
-            ]);
         } catch (\Exception $e) {
-            // Log the error
-            Log::error('Mail sending failed: ' . $e->getMessage());
+            Log::error('Contact form submission failed: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
             
-            // Since we've already logged the submission, return success
             return response()->json([
-                'status' => 'success',
-                'message' => 'Your message has been received! Our team will contact you shortly.'
-            ]);
+                'status' => 'error',
+                'message' => 'An error occurred while processing your request. Please try again later.',
+                'debug' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
     }
 
