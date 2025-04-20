@@ -2745,24 +2745,13 @@ __webpack_require__.r(__webpack_exports__);
         description: 'A web application designed to help users improve their typing speed and accuracy with various exercises and timed challenges.',
         image: '/images/Projects/typing-practice.jpg',
         categoryId: 'web',
-        tags: ['HTML', 'CSS', 'JavaScript'],
+        tags: ['HTML', 'CSS', 'Bootstrap', 'JavaScript'],
         date: 'April 2021',
-        liveUrl: '#',
+        liveUrl: 'https://misrilal-sah.github.io/Typing_Practice/',
         codeUrl: '#',
         hovered: false
       }, {
         id: 2,
-        title: 'School Website',
-        description: 'A website for a school that includes sections for announcements, event calendars, and course listings, built with HTML, CSS, and JavaScript.',
-        image: '/images/Projects/schhol.jpg',
-        categoryId: 'ui',
-        tags: ['HTML', 'CSS', 'JavaScript'],
-        date: 'March 2022',
-        liveUrl: '#',
-        codeUrl: '#',
-        hovered: false
-      }, {
-        id: 3,
         title: 'Vfurniture Ecommerce',
         description: 'An e-commerce platform for furniture sales that features try-on, product listings, customer reviews, and order tracking, built with PHP.',
         image: '/images/Projects/vfurniture.jpg',
@@ -2773,13 +2762,24 @@ __webpack_require__.r(__webpack_exports__);
         codeUrl: '#',
         hovered: false
       }, {
-        id: 4,
+        id: 3,
         title: 'Color Detection',
         description: 'A color detection app that uses machine learning algorithms to identify and suggest color codes from images.',
         image: '/images/Projects/color-detection.jpg',
         categoryId: 'web',
         tags: ['Python', 'Machine Learning', 'OpenCV'],
         date: 'January 2022',
+        liveUrl: '#',
+        codeUrl: '#',
+        hovered: false
+      }, {
+        id: 4,
+        title: 'School Website',
+        description: 'A website for a school that includes sections for announcements, event calendars, and course listings, built with HTML, CSS, and JavaScript.',
+        image: '/images/Projects/schhol.jpg',
+        categoryId: 'ui',
+        tags: ['HTML', 'CSS', 'JavaScript'],
+        date: 'March 2022',
         liveUrl: '#',
         codeUrl: '#',
         hovered: false
@@ -2928,17 +2928,29 @@ __webpack_require__.r(__webpack_exports__);
       });
       return category ? category.name : 'Uncategorized';
     },
+    handleLiveButtonClick: function handleLiveButtonClick(project) {
+      if (project.liveUrl && project.liveUrl !== '#') {
+        window.open(project.liveUrl, '_blank');
+      } else {
+        this.showComingSoonMessage('live', project.title);
+      }
+    },
+    handleCodeButtonClick: function handleCodeButtonClick(project) {
+      if (project.codeUrl && project.codeUrl !== '#') {
+        window.open(project.codeUrl, '_blank');
+      } else {
+        this.showComingSoonMessage('code', project.title);
+      }
+    },
     showComingSoonMessage: function showComingSoonMessage(type, projectTitle) {
       var action = type === 'live' ? 'live demo' : 'source code';
       this.popupMessage = "The ".concat(action, " for <strong>").concat(projectTitle, "</strong> is currently being set up.<br>Please check back later!");
       this.showPopup = true;
-      // Prevent scrolling when popup is open
       document.body.style.overflow = 'hidden';
     },
     closePopup: function closePopup() {
       this.showPopup = false;
       this.popupMessage = '';
-      // Restore scrolling
       document.body.style.overflow = '';
     }
   }
@@ -4369,7 +4381,7 @@ var render = function render() {
       staticClass: "action-button primary",
       on: {
         click: function click($event) {
-          return _vm.showComingSoonMessage("live", project.title);
+          return _vm.handleLiveButtonClick(project);
         }
       }
     }, [_c("i", {
@@ -4378,7 +4390,7 @@ var render = function render() {
       staticClass: "action-button secondary",
       on: {
         click: function click($event) {
-          return _vm.showComingSoonMessage("code", project.title);
+          return _vm.handleCodeButtonClick(project);
         }
       }
     }, [_c("i", {

@@ -27,11 +27,11 @@
           <img :src="project.image" :alt="project.title">
           <div class="project-overlay" :class="{ active: project.hovered }">
             <div class="project-actions">
-              <button @click="showComingSoonMessage('live', project.title)" class="action-button primary">
+              <button @click="handleLiveButtonClick(project)" class="action-button primary">
                 <i class="fas fa-external-link-alt"></i>
                 <span>View Live</span>
               </button>
-              <button @click="showComingSoonMessage('code', project.title)" class="action-button secondary">
+              <button @click="handleCodeButtonClick(project)" class="action-button secondary">
                 <i class="fas fa-code"></i>
                 <span>View Code</span>
               </button>
@@ -102,26 +102,14 @@ export default {
           description: 'A web application designed to help users improve their typing speed and accuracy with various exercises and timed challenges.',
           image: '/images/Projects/typing-practice.jpg',
           categoryId: 'web',
-          tags: ['HTML', 'CSS', 'JavaScript'],
+          tags: ['HTML', 'CSS', 'Bootstrap', 'JavaScript'],
           date: 'April 2021',
-          liveUrl: '#',
+          liveUrl: 'https://misrilal-sah.github.io/Typing_Practice/',
           codeUrl: '#',
           hovered: false
         },
         {
           id: 2,
-          title: 'School Website',
-          description: 'A website for a school that includes sections for announcements, event calendars, and course listings, built with HTML, CSS, and JavaScript.',
-          image: '/images/Projects/schhol.jpg',
-          categoryId: 'ui',
-          tags: ['HTML', 'CSS', 'JavaScript'],
-          date: 'March 2022',
-          liveUrl: '#',
-          codeUrl: '#',
-          hovered: false
-        },
-        {
-          id: 3,
           title: 'Vfurniture Ecommerce',
           description: 'An e-commerce platform for furniture sales that features try-on, product listings, customer reviews, and order tracking, built with PHP.',
           image: '/images/Projects/vfurniture.jpg',
@@ -133,13 +121,25 @@ export default {
           hovered: false
         },
         {
-          id: 4,
+          id: 3,
           title: 'Color Detection',
           description: 'A color detection app that uses machine learning algorithms to identify and suggest color codes from images.',
           image: '/images/Projects/color-detection.jpg',
           categoryId: 'web',
           tags: ['Python', 'Machine Learning', 'OpenCV'],
           date: 'January 2022',
+          liveUrl: '#',
+          codeUrl: '#',
+          hovered: false
+        },
+        {
+          id: 4,
+          title: 'School Website',
+          description: 'A website for a school that includes sections for announcements, event calendars, and course listings, built with HTML, CSS, and JavaScript.',
+          image: '/images/Projects/schhol.jpg',
+          categoryId: 'ui',
+          tags: ['HTML', 'CSS', 'JavaScript'],
+          date: 'March 2022',
           liveUrl: '#',
           codeUrl: '#',
           hovered: false
@@ -295,17 +295,29 @@ export default {
       const category = this.categories.find(cat => cat.id === categoryId);
       return category ? category.name : 'Uncategorized';
     },
+    handleLiveButtonClick(project) {
+      if (project.liveUrl && project.liveUrl !== '#') {
+        window.open(project.liveUrl, '_blank');
+      } else {
+        this.showComingSoonMessage('live', project.title);
+      }
+    },
+    handleCodeButtonClick(project) {
+      if (project.codeUrl && project.codeUrl !== '#') {
+        window.open(project.codeUrl, '_blank');
+      } else {
+        this.showComingSoonMessage('code', project.title);
+      }
+    },
     showComingSoonMessage(type, projectTitle) {
       const action = type === 'live' ? 'live demo' : 'source code';
       this.popupMessage = `The ${action} for <strong>${projectTitle}</strong> is currently being set up.<br>Please check back later!`;
       this.showPopup = true;
-      // Prevent scrolling when popup is open
       document.body.style.overflow = 'hidden';
     },
     closePopup() {
       this.showPopup = false;
       this.popupMessage = '';
-      // Restore scrolling
       document.body.style.overflow = '';
     }
   }
