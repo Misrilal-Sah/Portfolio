@@ -164,9 +164,12 @@
         <div class="social-links">
           <h3>Connect With Me</h3>
           <div class="social-icons">
-            <!-- <a href="https://github.com/Misrilal-Sah" target="_blank" class="social-icon">
+            <!-- Commented out GitHub icon temporarily -->
+            <!--
+            <a href="https://github.com/Misrilal-Sah" target="_blank" class="social-icon">
               <img src="/images/contact/connect/git-svgrepo-com.svg" alt="GitHub" class="social-svg">
-            </a> -->
+            </a>
+            -->
             <a href="https://www.linkedin.com/in/misrilal-sah/" target="_blank" class="social-icon">
               <img src="/images/contact/connect/linkedin.svg" alt="LinkedIn" class="social-svg">
             </a>
