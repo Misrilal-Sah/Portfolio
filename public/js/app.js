@@ -3783,7 +3783,15 @@ var render = function render() {
     "class": ["form-status", _vm.formStatus.type]
   }, [_vm._v("\n          " + _vm._s(_vm.formStatus.message) + "\n        ")]) : _vm._e()])]), _vm._v(" "), _vm.showSuccessAnimation ? _c("div", {
     staticClass: "success-animation"
-  }, [_vm._m(3)]) : _vm._e(), _vm._v(" "), _vm._m(4)])]);
+  }, [_vm._m(3)]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "contact-info-container"
+  }, [_c("h2", {
+    staticClass: "section-title"
+  }, [_vm._v("Contact Information")]), _vm._v(" "), _vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "social-links"
+  }, [_c("h3", [_vm._v("Connect With Me")]), _vm._v(" "), _c("div", {
+    staticClass: "social-icons"
+  }, [false ? undefined : _vm._e(), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9), _vm._v(" "), _vm._m(10)])]), _vm._v(" "), _vm._m(11)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -3853,10 +3861,6 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "contact-info-container"
-  }, [_c("h2", {
-    staticClass: "section-title"
-  }, [_vm._v("Contact Information")]), _vm._v(" "), _c("div", {
     staticClass: "contact-info"
   }, [_c("div", {
     staticClass: "info-item"
@@ -3902,23 +3906,11 @@ var staticRenderFns = [function () {
     attrs: {
       href: "tel:+918237138622"
     }
-  }, [_vm._v("+91 8237138622")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "social-links"
-  }, [_c("h3", [_vm._v("Connect With Me")]), _vm._v(" "), _c("div", {
-    staticClass: "social-icons"
-  }, [_c("a", {
-    staticClass: "social-icon",
-    attrs: {
-      href: "https://github.com/Misrilal-Sah",
-      target: "_blank"
-    }
-  }, [_c("img", {
-    staticClass: "social-svg",
-    attrs: {
-      src: "/images/contact/connect/git-svgrepo-com.svg",
-      alt: "GitHub"
-    }
-  })]), _vm._v(" "), _c("a", {
+  }, [_vm._v("+91 8237138622")])])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://www.linkedin.com/in/misrilal-sah/",
@@ -3930,7 +3922,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/linkedin.svg",
       alt: "LinkedIn"
     }
-  })]), _vm._v(" "), _c("a", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://www.instagram.com/sah._099/",
@@ -3942,7 +3938,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/instagram-1-svgrepo-com.svg",
       alt: "Instagram"
     }
-  })]), _vm._v(" "), _c("a", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://reddit.com/u/Sad-Expression6099",
@@ -3954,7 +3954,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/reddit-svgrepo-com.svg",
       alt: "Reddit"
     }
-  })]), _vm._v(" "), _c("a", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://discord.com/users/misrilalsah",
@@ -3966,7 +3970,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/discord-icon-svgrepo-com.svg",
       alt: "Discord"
     }
-  })]), _vm._v(" "), _c("a", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://wa.me/918237138622",
@@ -3978,7 +3986,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/whatsapp-svgrepo-com.svg",
       alt: "WhatsApp"
     }
-  })]), _vm._v(" "), _c("a", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("a", {
     staticClass: "social-icon",
     attrs: {
       href: "https://t.me/John715",
@@ -3990,7 +4002,11 @@ var staticRenderFns = [function () {
       src: "/images/contact/connect/telegram-svgrepo-com.svg",
       alt: "Telegram"
     }
-  })])])]), _vm._v(" "), _c("div", {
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "availability"
   }, [_c("h3", [_vm._v("Availability")]), _vm._v(" "), _c("div", {
     staticClass: "availability-status"
@@ -4000,7 +4016,7 @@ var staticRenderFns = [function () {
     staticClass: "response-time"
   }, [_c("i", {
     staticClass: "fas fa-clock"
-  }), _vm._v(" Average response time: 24 hours\n        ")])])]);
+  }), _vm._v(" Average response time: 24 hours\n        ")])]);
 }];
 render._withStripped = true;
 
