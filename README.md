@@ -1,5 +1,4 @@
 <div style="position: relative; width: 100%; height: 280px; background: #0f0f1e; overflow: hidden; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-  <!-- Diagonal gradient background -->
   <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" viewBox="0 0 1200 280" preserveAspectRatio="none">
     <defs>
       <linearGradient id="diagonalGradient" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -11,7 +10,6 @@
     <polygon points="0,280 1200,280 1200,0 0,100" fill="url(#diagonalGradient)" />
   </svg>
 
-  <!-- Content -->
   <div style="position: relative; z-index: 10; padding: 50px 40px; height: 100%; display: flex; flex-direction: column; justify-content: center;">
     <h1 style="font-size: 3.8em; font-weight: 900; color: #ffffff; margin: 0; letter-spacing: 3px; text-shadow: 0 6px 30px rgba(0,0,0,0.4); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
       NETFLIX PORTFOLIO
