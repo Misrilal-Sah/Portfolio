@@ -158,7 +158,6 @@ Contributions are welcome! Feel free to:
 - Submit pull requests
 
 ---
-
 ## 📧 Get In Touch
 
 **Have questions or want to collaborate?** Reach out through any of these channels:
@@ -172,5 +171,4 @@ Contributions are welcome! Feel free to:
 This project is open-sourced under the **MIT License** - Feel free to use, modify, and distribute.
 
 ---
-
 **Made with ❤️ by Misrilal Sah** | ⭐ [Star the repo](https://github.com/Misrilal-Sah/Portfolio) if you found this helpful!
